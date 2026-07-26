@@ -182,3 +182,46 @@
     animation-duration: 1.5s;
   }
 }
+
+
+/* 모바일: 메인 페이지와 모든 리뷰 페이지의 리뷰 갤러리를 2열로 표시 */
+@media (max-width: 600px) {
+  .gj-review-gallery {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    column-gap: 10px !important;
+    row-gap: 10px !important;
+    align-items: stretch !important;
+    width: 100% !important;
+  }
+
+  .gj-review-gallery > .gj-review-card {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    margin: 0 !important;
+    align-self: stretch !important;
+  }
+
+  .gj-review-card [data-root="true"][placeholder="Untitled"] {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    font-size: 14px !important;
+  }
+
+  .gj-review-card .css-1yjhumr {
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .gj-review-card .css-1yjhumr > div {
+    max-width: calc(100% - 12px) !important;
+    overflow: hidden !important;
+  }
+
+  .gj-review-card .css-1yjhumr > div > div {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+}

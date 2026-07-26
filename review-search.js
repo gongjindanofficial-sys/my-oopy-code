@@ -105,6 +105,34 @@
     return cards;
   }
 
+
+  function applyMobileGalleryClasses() {
+    const cards = getCards();
+    const activeContainers = new Set();
+
+    cards.forEach(({ element }) => {
+      const container = element.parentElement;
+      if (!container) return;
+
+      element.classList.add("gj-review-card");
+      container.classList.add("gj-review-gallery");
+      activeContainers.add(container);
+    });
+
+    // 우피 내부 페이지 이동 등으로 더 이상 갤러리가 아닌 요소의 클래스 정리
+    document.querySelectorAll(".gj-review-gallery").forEach((container) => {
+      if (!activeContainers.has(container)) {
+        container.classList.remove("gj-review-gallery");
+      }
+    });
+
+    document.querySelectorAll(".gj-review-card").forEach((card) => {
+      if (!cards.some(({ element }) => element === card)) {
+        card.classList.remove("gj-review-card");
+      }
+    });
+  }
+
   function findLoadMoreButton() {
     const candidates = [
       ...document.querySelectorAll('[role="button"], button'),
@@ -183,8 +211,11 @@
           previousCount = currentCount;
         }
 
+        applyMobileGalleryClasses();
         await sleep(150);
       }
+
+      applyMobileGalleryClasses();
 
       if (!findLoadMoreButton()) {
         allCardsLoaded = true;
@@ -273,6 +304,7 @@
      * 모바일 2열용 클래스를 적용합니다.
      * 검색 UI는 아래에서 모든 리뷰 페이지에만 생성됩니다.
      */
+    applyMobileGalleryClasses();
     const cards = getCards();
 
     if (!isTargetPage()) {
