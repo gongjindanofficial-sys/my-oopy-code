@@ -1,126 +1,160 @@
-#oopy-search-container {
-  width: 100%;
-  max-width: 900px;
-  margin: 10px auto 25px;
-  padding: 0 16px;
-  box-sizing: border-box;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  position: relative;
-  z-index: 9999;
+/* STREAMING_CHUNK:Styling the main search bar container and input field... /
+/ 우피 노션 검색창 메인 컨테이너 */
+.oopy-search-container {
+width: 100%;
+margin: 16px 0 28px 0;
+font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+box-sizing: border-box;
 }
 
-.oopy-search-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-  background: #ffffff;
-  border: 2px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 10px 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  transition: all 0.2s ease;
-  pointer-events: auto;
+/* 검색 입력창 감싸는 박스 */
+.oopy-search-input-wrapper {
+position: relative;
+display: flex;
+align-items: center;
+width: 100%;
+background-color: #f7f6f3;
+border: 1px solid #e1e0dc;
+border-radius: 10px;
+padding: 10px 16px;
+box-sizing: border-box;
+transition: all 0.2s ease-in-out;
+box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
 }
 
-.oopy-search-wrapper:focus-within {
-  border-color: #3b82f6;
-  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.15);
+.oopy-search-input-wrapper:focus-within {
+background-color: #ffffff;
+border-color: #2eaadc;
+box-shadow: 0 0 0 3px rgba(46, 170, 220, 0.2);
 }
 
+/* 돋보기 아이콘 */
 .oopy-search-icon {
-  width: 20px;
-  height: 20px;
-  color: #9ca3af;
-  margin-right: 12px;
-  flex-shrink: 0;
+width: 18px;
+height: 18px;
+margin-right: 12px;
+fill: none;
+stroke: #73726e;
+stroke-width: 2;
+stroke-linecap: round;
+stroke-linejoin: round;
+flex-shrink: 0;
 }
 
+/* 텍스트 입력 폼 */
 .oopy-search-input {
-  width: 100%;
-  border: none;
-  outline: none;
-  font-size: 16px;
-  color: #1f2937;
-  background: transparent;
-  pointer-events: auto;
+width: 100%;
+border: none;
+outline: none;
+background: transparent;
+font-size: 15px;
+color: #37352f;
+padding: 0;
 }
 
 .oopy-search-input::placeholder {
-  color: #9ca3af;
+color: #9b9a97;
 }
 
-.oopy-search-clear {
-  background: #f3f4f6;
-  border: none;
-  color: #6b7280;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  margin-left: 8px;
+/* STREAMING_CHUNK:Styling status counter and reset buttons... /
+/ 초기화(지우기) 버튼 */
+.oopy-search-clear-btn {
+display: none;
+background: #e1e0dc;
+border: none;
+border-radius: 50%;
+width: 20px;
+height: 20px;
+font-size: 12px;
+line-height: 20px;
+text-align: center;
+color: #5a5a5a;
+cursor: pointer;
+margin-left: 8px;
+padding: 0;
+flex-shrink: 0;
 }
 
-.oopy-search-clear:hover {
-  background: #e5e7eb;
-  color: #111827;
+.oopy-search-clear-btn:hover {
+background: #d3d2ce;
+color: #111;
 }
 
+/* 검색 결과 건수 및 안내 뱃지 */
 .oopy-search-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 10px;
-  padding: 0 4px;
-  font-size: 14px;
-  color: #6b7280;
+display: flex;
+align-items: center;
+justify-content: space-between;
+margin-top: 8px;
+font-size: 13px;
+color: #73726e;
+padding: 0 4px;
 }
 
-.oopy-search-count {
-  font-weight: 600;
-  color: #3b82f6;
+.oopy-search-count-badge {
+font-weight: 600;
+color: #2eaadc;
 }
 
-.oopy-no-results {
-  text-align: center;
-  padding: 40px 20px;
-  background: #f9fafb;
-  border-radius: 12px;
-  margin-top: 20px;
-  color: #6b7280;
-  font-size: 15px;
-  display: none;
+.oopy-search-loading {
+display: none;
+align-items: center;
+gap: 6px;
+color: #eb5757;
+font-size: 12px;
 }
 
-/* 갤러리 그리드 레이아웃 유지 설정 */
+.oopy-search-spinner {
+width: 12px;
+height: 12px;
+border: 2px solid #eb5757;
+border-top-color: transparent;
+border-radius: 50%;
+animation: oopy-spin 0.8s linear infinite;
+}
+
+@keyframes oopy-spin {
+0% { transform: rotate(0deg); }
+100% { transform: rotate(360deg); }
+}
+
+/* STREAMING_CHUNK:Formatting gallery grid layout for left-top alignment... /
+/ 노션 갤러리 그리드 좌상단 정렬 강제 지정 /
 .notion-gallery-view,
-.notion-collection_view-block,
-[class*="gallery-view"],
-[class*="collection_view"] {
-  justify-content: flex-start !important;
-  justify-items: start !important;
-  align-content: start !important;
-  align-items: start !important;
+div[class="galleryView"] {
+display: grid !important;
+grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)) !important;
+justify-content: start !important;
+align-content: start !important;
+gap: 16px !important;
 }
 
-/* 다크모드 지원 */
+/* 숨겨진 카드 처리 */
+.oopy-card-hidden {
+display: none !important;
+}
+
+/* 노출된 카드 좌상단 정렬 배치 유지 */
+.notion-collection-card,
+a.notion-collection-card {
+margin: 0 !important;
+height: 100% !important;
+}
+
+/* 다크모드 대응 */
 @media (prefers-color-scheme: dark) {
-  .oopy-search-wrapper {
-    background: #1f2937;
-    border-color: #374151;
-  }
-  .oopy-search-input {
-    color: #f9fafb;
-  }
-  .oopy-search-clear {
-    background: #374151;
-    color: #9ca3af;
-  }
-  .oopy-no-results {
-    background: #111827;
-    color: #9ca3af;
-  }
+.oopy-search-input-wrapper {
+background-color: #2f2f2f;
+border-color: #3f3f3f;
+}
+.oopy-search-input-wrapper:focus-within {
+background-color: #202020;
+border-color: #2eaadc;
+}
+.oopy-search-input {
+color: #e3e3e3;
+}
+.oopy-search-input::placeholder {
+color: #787774;
+}
 }
