@@ -1,34 +1,25 @@
-/* STREAMING_CHUNK:Initializing global variables and observer state... */
 (function() {
-const SUBPAGE_PREFIX = '3a74503e';
 let isFullyLoaded = false;
 let isLoadingAll = false;
 let isObserverPaused = false;
 
-// MutationObserver 무한 재귀 방지용
 function withObserverPaused(fn) {
 isObserverPaused = true;
-try {
-fn();
-} finally {
-setTimeout(() => { isObserverPaused = false; }, 50);
-}
+try { fn(); } finally { setTimeout(() => { isObserverPaused = false; }, 50); }
 }
 
-/* STREAMING_CHUNK:Defining function to hide property details button... /
 function removePropertyMoreBtn() {
 document.querySelectorAll('div, span, p').forEach(el => {
 if (!el.getAttribute('data-oopy-checked') && el.children.length === 0 && el.textContent.includes('속성') && el.textContent.includes('더 보기')) {
 el.setAttribute('data-oopy-checked', 'true');
-const btn = el.closest('[role="button"]') || el.closest('div[style="cursor"]') || el;
+const btn = el.closest('[role="button"]') || el.closest('div[style*="cursor"]') || el;
 if (btn) btn.style.setProperty('display', 'none', 'important');
 }
 });
 }
 
-/* STREAMING_CHUNK:Defining gallery card and top element query functions... /
 function getGalleryCards() {
-let cards = document.querySelectorAll('.notion-collection-card, [class="collection-card"]');
+let cards = document.querySelectorAll('.notion-collection-card, [class*="collection-card"]');
 if (!cards.length) {
 const view = document.querySelector('.notion-gallery-view, .notion-collection_view-block, [class*="gallery"]');
 if (view) cards = view.querySelectorAll('a, div[role="button"]');
@@ -52,9 +43,8 @@ curr = parent;
 return card;
 }
 
-/* STREAMING_CHUNK:Extracting card title (organization name) precisely... /
 function getCardTitle(card) {
-const titleEl = card.querySelector('.notion-property-title, [class="property-title"], [class*="card__title"]');
+const titleEl = card.querySelector('.notion-property-title, [class*="property-title"], [class*="card__title"]');
 if (titleEl && titleEl.textContent.trim()) return titleEl.textContent.trim();
 const textEls = card.querySelectorAll('span, p, div');
 for (let i = 0; i < textEls.length; i++) {
@@ -66,7 +56,6 @@ return txt;
 return card.textContent.trim();
 }
 
-/* STREAMING_CHUNK:Handling auto load all cards by clicking load more... */
 function loadAllCards(onProgress, onComplete) {
 if (isFullyLoaded) { if (onComplete) onComplete(); return; }
 if (isLoadingAll) return;
@@ -97,7 +86,6 @@ const timer = setInterval(() => {
 
 }
 
-/* STREAMING_CHUNK:Executing card search and filtering logic... */
 function filterCards() {
 const input = document.getElementById('oopy-search-input');
 if (!input) return;
@@ -140,46 +128,37 @@ if (query) {
 
 }
 
-/* STREAMING_CHUNK:Rendering search bar UI and attaching event listeners... */
 function createSearchBar() {
-if (!window.location.href.toLowerCase().includes(SUBPAGE_PREFIX)) return;
 if (document.getElementById('oopy-search-container')) return;
 
 const target = document.querySelector('.notion-collection_view-block') ||
                document.querySelector('.notion-gallery-view') ||
-               document.querySelector('main') || document.body;
-if (!target) return;
+               document.querySelector('[class*="gallery"]') ||
+               document.querySelector('.notion-page-content');
 
-const html = `
-  <div id="oopy-search-container">
-    <div class="oopy-search-wrapper">
-      <svg class="oopy-search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-      <input type="text" id="oopy-search-input" class="oopy-search-input" placeholder="기관명을 입력하세요 (예: 성남시, 방위사업청)" autocomplete="off"/>
-      <button type="button" id="oopy-search-clear" class="oopy-search-clear">✕</button>
-    </div>
-    <div class="oopy-search-info">
-      <span id="oopy-search-status">원하시는 기관명을 검색해 보세요.</span>
-      <span id="oopy-search-count-wrapper" style="display:none;">검색 결과: <span id="oopy-search-count" class="oopy-search-count">0</span>개</span>
-    </div>
-    <div id="oopy-no-results" class="oopy-no-results">🔍 검색 결과와 일치하는 기관이 없습니다.</div>
+if (!target || !target.parentNode) return;
+
+const container = document.createElement('div');
+container.id = 'oopy-search-container';
+container.innerHTML = `
+  <div class="oopy-search-wrapper">
+    <svg class="oopy-search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+    <input type="text" id="oopy-search-input" class="oopy-search-input" placeholder="기관명을 입력하세요 (예: 성남시, 방위사업청)" autocomplete="off"/>
+    <button type="button" id="oopy-search-clear" class="oopy-search-clear">✕</button>
   </div>
+  <div class="oopy-search-info">
+    <span id="oopy-search-status">원하시는 기관명을 검색해 보세요.</span>
+    <span id="oopy-search-count-wrapper" style="display:none;">검색 결과: <span id="oopy-search-count" class="oopy-search-count">0</span>개</span>
+  </div>
+  <div id="oopy-no-results" class="oopy-no-results">🔍 검색 결과와 일치하는 기관이 없습니다.</div>
 `;
 
-const div = document.createElement('div');
-div.innerHTML = html.trim();
-const elem = div.firstChild;
-
-if (target.parentNode && target !== document.body) {
-  target.parentNode.insertBefore(elem, target);
-} else {
-  target.prepend(elem);
-}
+target.parentNode.insertBefore(container, target);
 
 const input = document.getElementById('oopy-search-input');
 const clearBtn = document.getElementById('oopy-search-clear');
 
 if (input) {
-  // 노션 키보드 이벤트 가로채기 차단
   const stopProp = (e) => e.stopPropagation();
   input.addEventListener('keydown', stopProp);
   input.addEventListener('keyup', stopProp);
@@ -203,32 +182,38 @@ if (clearBtn) {
 
 }
 
-/* STREAMING_CHUNK:Setting up MutationObserver for DOM changes... */
-const observer = new MutationObserver(() => {
-if (isObserverPaused) return;
+function init() {
 withObserverPaused(() => {
 removePropertyMoreBtn();
 createSearchBar();
+});
+}
+
+const observer = new MutationObserver(() => {
+if (isObserverPaused) return;
+init();
 const input = document.getElementById('oopy-search-input');
 if (input && document.activeElement !== input && input.value.trim().length > 0) {
 filterCards();
 }
 });
-});
 
+if (document.readyState === 'loading') {
 document.addEventListener('DOMContentLoaded', () => {
 observer.observe(document.body, { childList: true, subtree: true });
-withObserverPaused(() => {
-removePropertyMoreBtn();
-createSearchBar();
+init();
 });
-});
-
-if (document.body) {
-observer.observe(document.body, { childList: true, subtree: true });
-withObserverPaused(() => {
-removePropertyMoreBtn();
-createSearchBar();
-});
+} else {
+if (document.body) observer.observe(document.body, { childList: true, subtree: true });
+init();
 }
+
+let attempts = 0;
+const interval = setInterval(() => {
+attempts++;
+init();
+if (document.getElementById('oopy-search-container') || attempts > 15) {
+clearInterval(interval);
+}
+}, 200);
 })();
