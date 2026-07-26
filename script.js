@@ -20,7 +20,6 @@
       '.notion-property-title',
       '[class*="property-title"]',
       '[class*="propertyTitle"]',
-      '[class*="title"]',
       '.notion-collection-card-property:first-child',
       '.notion-collection-card-body > div:first-child',
       'span[style*="font-weight"]',
@@ -44,44 +43,23 @@
     return fullText;
   }
 
-  // 갤러리 카드 최상위 요소 수집
+  // 순수 노션 갤러리 카드 목록만 수집
   function getGalleryCards() {
-    const galleryContainers = document.querySelectorAll(
-      '.notion-gallery-view, [class*="galleryView"], .notion-collection-gallery, [class*="collectionGallery"], .notion-collection-view-body'
+    const cardCandidates = Array.from(
+      document.querySelectorAll('.notion-collection-card, a[class*="collectionCard"], div[class*="collectionCard"]')
     );
-    
-    let rawCards = [];
-    galleryContainers.forEach(container => {
-      const candidateCards = Array.from(
-        container.querySelectorAll('.notion-collection-card, a[class*="collectionCard"], div[class*="collectionCard"], [class*="collection-card"]')
-      );
-      if (candidateCards.length > 0) {
-        rawCards = rawCards.concat(candidateCards);
-      } else {
-        // 백업: 컨테이너 직계 자식
-        rawCards = rawCards.concat(Array.from(container.children));
-      }
+
+    // 검색창 등 외부 감싸는 요소 제외
+    const validCards = cardCandidates.filter(card => {
+      return !card.closest('.oopy-search-container') && !card.classList.contains('oopy-search-container');
     });
 
-    // 검색창 등 관련 없는 요소 제거 및 최상위 카드만 필터링
-    const uniqueCards = Array.from(new Set(rawCards)).filter(card => {
-      return !card.classList.contains('oopy-search-container') && !card.id?.includes('oopy-search');
+    // 중첩 구조 중 최상위 카드 노드만 정밀 필터링
+    const topCards = validCards.filter(card => {
+      return !validCards.some(other => other !== card && other.contains(card));
     });
 
-    // 중첩된 자식 카드 제거하고 독립적인 최상위 카드 추출
-    const topCards = uniqueCards.filter(card => {
-      return !uniqueCards.some(other => other !== card && other.contains(card));
-    });
-
-    if (topCards.length > 0) return topCards;
-
-    // 전체 Fallback
-    const fallbackCandidates = Array.from(
-      document.querySelectorAll('.notion-collection-card, [class*="collectionCard"]')
-    );
-    return fallbackCandidates.filter(card => {
-      return !fallbackCandidates.some(other => other !== card && other.contains(card));
-    });
+    return topCards;
   }
 
   // '더 보기' 버튼 자동 클릭 (전체 데이터 대상 검색)
@@ -112,7 +90,7 @@
     checkAndClickMore();
   }
 
-  // 카드 필터링 처리 (상위 레이아웃을 숨기지 않음)
+  // 카드 필터링 처리 (상위 레이아웃을 건드리지 않고 카드 개별 노출/숨김)
   function filterCards(query) {
     const cards = getGalleryCards();
     const cleanQuery = cleanStr(query);
@@ -132,24 +110,13 @@
       const matches = !cleanQuery || cleanInstName.includes(cleanQuery);
 
       if (matches) {
-        // 일치 시 해당 카드 복원
         card.classList.remove('oopy-card-hidden');
         card.style.removeProperty('display');
         visibleCount++;
       } else {
-        // 미일치 시 해당 카드만 정확히 숨김
         card.classList.add('oopy-card-hidden');
         card.style.setProperty('display', 'none', 'important');
       }
-    });
-
-    // 갤러리 컨테이너 자체는 항상 노출 유지
-    const galleryContainers = document.querySelectorAll(
-      '.notion-gallery-view, [class*="galleryView"], .notion-collection-gallery, [class*="collectionGallery"], .notion-collection-view-body'
-    );
-    galleryContainers.forEach(container => {
-      container.classList.remove('oopy-card-hidden');
-      container.style.removeProperty('display');
     });
 
     if (infoCountBadge) {
@@ -165,7 +132,7 @@
   function createSearchBar() {
     if (document.getElementById('oopy-search-container')) return;
 
-    // '모든 리뷰' 제목 또는 최상단 헤더 탐색
+    // '모든 리뷰' 제목 또는 헤더 탐색
     const targetHeading = Array.from(document.querySelectorAll('h1, h2, h3, .notion-header, [class*="header"]'))
       .find(el => {
         const txt = el.textContent.trim();
@@ -217,7 +184,7 @@
     input.addEventListener('input', (e) => {
       const val = e.target.value;
       clearTimeout(debounceTimer);
-      
+
       if (val.trim().length > 0) {
         expandAllPages(() => {
           debounceTimer = setTimeout(() => {
