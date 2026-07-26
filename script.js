@@ -28,19 +28,15 @@ return Array.from(cards);
 }
 
 function getTopCardElement(card) {
+const gallery = card.closest('.notion-gallery-view, [class*="gallery-view"], [class*="gallery"]');
+if (gallery) {
 let curr = card;
-while (curr.parentElement) {
-const parent = curr.parentElement;
-if (parent === document.body || parent.tagName === 'MAIN') break;
-if (parent.classList.contains('notion-gallery-view') ||
-parent.classList.contains('notion-collection_view-block') ||
-parent.className.includes('gallery') ||
-(parent.children.length > 1 && (parent.className.includes('collection') || parent.className.includes('view')))) {
-return curr;
+while (curr && curr.parentElement && curr.parentElement !== gallery) {
+curr = curr.parentElement;
 }
-curr = parent;
+if (curr && curr.parentElement === gallery) return curr;
 }
-return card;
+return card.closest('a') || card.closest('.notion-collection-card') || card;
 }
 
 function getCardTitle(card) {
