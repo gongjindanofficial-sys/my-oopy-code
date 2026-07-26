@@ -28,15 +28,19 @@ return Array.from(cards);
 }
 
 function getTopCardElement(card) {
-const gallery = card.closest('.notion-gallery-view, [class*="gallery-view"], [class*="gallery"]');
-if (gallery) {
-let curr = card;
-while (curr && curr.parentElement && curr.parentElement !== gallery) {
-curr = curr.parentElement;
+let top = card.closest('a') || card;
+while (top.parentElement) {
+const parent = top.parentElement;
+if (parent.tagName === 'BODY' || parent.tagName === 'HTML') break;
+if (parent.querySelectorAll('.notion-collection-card, [class*="collection-card"]').length > 1) {
+break;
 }
-if (curr && curr.parentElement === gallery) return curr;
+if (parent.classList && (parent.classList.contains('notion-gallery-view') || parent.className.toString().includes('gallery'))) {
+break;
 }
-return card.closest('a') || card.closest('.notion-collection-card') || card;
+top = parent;
+}
+return top;
 }
 
 function getCardTitle(card) {
@@ -44,9 +48,12 @@ const titleEl = card.querySelector('.notion-property-title, [class*="property-ti
 if (titleEl && titleEl.textContent.trim()) return titleEl.textContent.trim();
 const textEls = card.querySelectorAll('span, p, div');
 for (let i = 0; i < textEls.length; i++) {
-const txt = textEls[i].textContent.trim();
-if (txt && textEls[i].children.length === 0 && !txt.includes('★') && !txt.includes('http')) {
+const el = textEls[i];
+if (el.children.length === 0) {
+const txt = el.textContent.trim();
+if (txt && !txt.includes('★') && !txt.includes('http') && !txt.startsWith('@')) {
 return txt;
+}
 }
 }
 return card.textContent.trim();
