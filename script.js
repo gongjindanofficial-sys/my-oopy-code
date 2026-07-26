@@ -8,9 +8,10 @@
   // 문자열 정규화 (한글 조합 및 띄어쓰기/특수문자 무시 검색)
   function cleanStr(str) {
     if (!str) return '';
-    return str.normalize('NFC').toLowerCase().replace(/[\s\t\n\r\.\,\_\-\(\)\[\]\/\:\;]/g, '');
+    return str.normalize('NFC').toLowerCase().replace(/[\s\t\n\r\.\,\_\-\(\)\[\]\/\:\;\*\~\!\@\#\$\%\^\&\=]/g, '');
   }
 
+  // 카드 내 기관명(제목) 정밀 추출
   function getInstitutionName(card) {
     if (!card) return '';
 
@@ -19,9 +20,9 @@
       '.notion-property-title',
       '[class*="property-title"]',
       '[class*="propertyTitle"]',
+      '[class*="title"]',
       '.notion-collection-card-property:first-child',
       '.notion-collection-card-body > div:first-child',
-      '.notion-collection-card-body span',
       'span[style*="font-weight"]',
       'div[style*="font-weight"]'
     ];
@@ -33,7 +34,7 @@
       }
     }
 
-    // 탐색 실패 시 카드의 첫 번째 줄 텍스트를 기관명으로 간주
+    // 탐색 실패 시 카드의 첫 줄 텍스트 추출
     const fullText = card.textContent.trim();
     if (fullText) {
       const lines = fullText.split('\n').map(l => l.trim()).filter(Boolean);
@@ -43,56 +44,66 @@
     return fullText;
   }
 
+  // 갤러리 카드 최상위 요소 수집
   function getGalleryCards() {
     const galleryContainers = document.querySelectorAll(
-      '.notion-gallery-view, [class*="galleryView"], .notion-collection-gallery, [class*="collectionGallery"]'
+      '.notion-gallery-view, [class*="galleryView"], .notion-collection-gallery, [class*="collectionGallery"], .notion-collection-view-body'
     );
     
-    let allCards = [];
+    let rawCards = [];
     galleryContainers.forEach(container => {
-      // 갤러리 내 카드 후보군 수집
       const candidateCards = Array.from(
-        container.querySelectorAll('.notion-collection-card, a[class*="collection-card"], div[class*="collection-card"], [class*="collectionCard"]')
+        container.querySelectorAll('.notion-collection-card, a[class*="collectionCard"], div[class*="collectionCard"], [class*="collection-card"]')
       );
-      
-      // 최하단 실제 카드만 필터링 (부모 감싸는 요소 제거)
-      const leafCards = candidateCards.filter(card => {
-        return !card.querySelector('.notion-collection-card, [class*="collection-card"], [class*="collectionCard"]');
-      });
-
-      allCards = allCards.concat(leafCards);
+      if (candidateCards.length > 0) {
+        rawCards = rawCards.concat(candidateCards);
+      } else {
+        // 백업: 컨테이너 직계 자식
+        rawCards = rawCards.concat(Array.from(container.children));
+      }
     });
 
-    // 갤러리 컨테이너 감지가 안 되었을 때의 Fallback
-    if (allCards.length === 0) {
-      const candidates = Array.from(
-        document.querySelectorAll('.notion-collection-card, a[class*="collection-card"], [class*="collectionCard"]')
-      );
-      allCards = candidates.filter(card => {
-        return !card.querySelector('.notion-collection-card, [class*="collection-card"], [class*="collectionCard"]');
-      });
-    }
+    // 검색창 등 관련 없는 요소 제거 및 최상위 카드만 필터링
+    const uniqueCards = Array.from(new Set(rawCards)).filter(card => {
+      return !card.classList.contains('oopy-search-container') && !card.id?.includes('oopy-search');
+    });
 
-    return allCards;
+    // 중첩된 자식 카드 제거하고 독립적인 최상위 카드 추출
+    const topCards = uniqueCards.filter(card => {
+      return !uniqueCards.some(other => other !== card && other.contains(card));
+    });
+
+    if (topCards.length > 0) return topCards;
+
+    // 전체 Fallback
+    const fallbackCandidates = Array.from(
+      document.querySelectorAll('.notion-collection-card, [class*="collectionCard"]')
+    );
+    return fallbackCandidates.filter(card => {
+      return !fallbackCandidates.some(other => other !== card && other.contains(card));
+    });
   }
 
+  // '더 보기' 버튼 자동 클릭 (전체 데이터 대상 검색)
   function expandAllPages(callback) {
     let attempts = 0;
-    const maxAttempts = 12;
+    const maxAttempts = 15;
 
     function checkAndClickMore() {
-      const loadMoreBtns = Array.from(document.querySelectorAll('div, span, button, [role="button"]'))
+      const loadMoreBtns = Array.from(document.querySelectorAll('div, span, button, [role="button"], a'))
         .filter(el => {
+          if (el.children.length > 0) return false;
           const text = el.textContent.trim();
-          return (text === '더 보기' || text === 'Load more' || el.classList.contains('notion-collection-view-load-more')) &&
-                 el.children.length === 0;
+          return (text === '더 보기' || text === 'Load more' || text === '더보기' ||
+                  el.classList.contains('notion-collection-view-load-more')) &&
+                 el.offsetWidth > 0 && el.offsetHeight > 0;
         });
 
       if (loadMoreBtns.length > 0 && attempts < maxAttempts) {
         attempts++;
         const btnContainer = loadMoreBtns[0].closest('[role="button"]') || loadMoreBtns[0];
         btnContainer.click();
-        setTimeout(checkAndClickMore, 250);
+        setTimeout(checkAndClickMore, 300);
       } else {
         if (callback) callback();
       }
@@ -101,6 +112,7 @@
     checkAndClickMore();
   }
 
+  // 카드 필터링 처리 (상위 레이아웃을 숨기지 않음)
   function filterCards(query) {
     const cards = getGalleryCards();
     const cleanQuery = cleanStr(query);
@@ -120,25 +132,24 @@
       const matches = !cleanQuery || cleanInstName.includes(cleanQuery);
 
       if (matches) {
-        // 검색 일치 시 카드 및 상위 레이아웃 복원
+        // 일치 시 해당 카드 복원
         card.classList.remove('oopy-card-hidden');
         card.style.removeProperty('display');
-        
-        if (card.parentElement && !card.parentElement.classList.contains('notion-gallery-view')) {
-          card.parentElement.classList.remove('oopy-card-hidden');
-          card.parentElement.style.removeProperty('display');
-        }
         visibleCount++;
       } else {
-        // 미일치 시 카드 숨김
+        // 미일치 시 해당 카드만 정확히 숨김
         card.classList.add('oopy-card-hidden');
         card.style.setProperty('display', 'none', 'important');
-
-        if (card.parentElement && !card.parentElement.classList.contains('notion-gallery-view') && card.parentElement.children.length === 1) {
-          card.parentElement.classList.add('oopy-card-hidden');
-          card.parentElement.style.setProperty('display', 'none', 'important');
-        }
       }
+    });
+
+    // 갤러리 컨테이너 자체는 항상 노출 유지
+    const galleryContainers = document.querySelectorAll(
+      '.notion-gallery-view, [class*="galleryView"], .notion-collection-gallery, [class*="collectionGallery"], .notion-collection-view-body'
+    );
+    galleryContainers.forEach(container => {
+      container.classList.remove('oopy-card-hidden');
+      container.style.removeProperty('display');
     });
 
     if (infoCountBadge) {
@@ -150,14 +161,20 @@
     }
   }
 
+  // 검색창 UI 동적 생성 및 위치 지정
   function createSearchBar() {
     if (document.getElementById('oopy-search-container')) return;
 
-    // 검색창 생성 타겟 헤더 / 갤러리 탐색
+    // '모든 리뷰' 제목 또는 최상단 헤더 탐색
     const targetHeading = Array.from(document.querySelectorAll('h1, h2, h3, .notion-header, [class*="header"]'))
-      .find(el => el.textContent.includes('모든 리뷰') || el.textContent.includes('최근 작성된 리뷰'));
+      .find(el => {
+        const txt = el.textContent.trim();
+        return txt.includes('모든 리뷰') || txt.includes('모든리뷰') || txt.includes('최근 작성된 리뷰');
+      });
 
-    const galleryContainer = document.querySelector('.notion-gallery-view, [class*="galleryView"], .notion-collection-gallery');
+    const galleryContainer = document.querySelector(
+      '.notion-gallery-view, [class*="galleryView"], .notion-collection-gallery, [class*="collectionGallery"]'
+    );
 
     if (!targetHeading && !galleryContainer) return;
 
@@ -171,7 +188,7 @@
           <circle cx="11" cy="11" r="8"></circle>
           <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
         </svg>
-        <input type="text" id="oopy-search-input" class="oopy-search-input" placeholder="원하시는 기관명을 검색해 보세요 (예: 창원, 서울시청)" autocomplete="off">
+        <input type="text" id="oopy-search-input" class="oopy-search-input" placeholder="원하시는 기관명을 검색해 보세요 (예: 경상북도, 창원)" autocomplete="off">
         <button id="oopy-search-clear" class="oopy-search-clear-btn" title="검색어 지우기">&times;</button>
       </div>
       <div class="oopy-search-info">
@@ -180,12 +197,16 @@
       </div>
     `;
 
-    if (targetHeading && targetHeading.parentNode) {
-      targetHeading.parentNode.insertBefore(container, targetHeading.nextSibling);
+    // 헤더 블록 직후에 검색창 삽입
+    if (targetHeading) {
+      const blockParent = targetHeading.closest('.notion-header-block, .notion-text-block, div[class*="block"]') || targetHeading;
+      if (blockParent && blockParent.parentNode) {
+        blockParent.parentNode.insertBefore(container, blockParent.nextSibling);
+      } else if (targetHeading.parentNode) {
+        targetHeading.parentNode.insertBefore(container, targetHeading.nextSibling);
+      }
     } else if (galleryContainer && galleryContainer.parentNode) {
       galleryContainer.parentNode.insertBefore(container, galleryContainer);
-    } else {
-      document.body.appendChild(container);
     }
 
     const input = document.getElementById('oopy-search-input');
@@ -197,11 +218,15 @@
       const val = e.target.value;
       clearTimeout(debounceTimer);
       
-      expandAllPages(() => {
-        debounceTimer = setTimeout(() => {
-          filterCards(val);
-        }, 120);
-      });
+      if (val.trim().length > 0) {
+        expandAllPages(() => {
+          debounceTimer = setTimeout(() => {
+            filterCards(val);
+          }, 100);
+        });
+      } else {
+        filterCards('');
+      }
     });
 
     clearBtn.addEventListener('click', () => {
@@ -213,7 +238,7 @@
     // 초기 카드 수 갱신
     setTimeout(() => {
       filterCards('');
-    }, 200);
+    }, 250);
   }
 
   function init() {
