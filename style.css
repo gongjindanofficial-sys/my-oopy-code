@@ -1,129 +1,126 @@
 #oopy-search-container {
-width: 100%;
-max-width: 900px;
-margin: 10px auto 25px;
-padding: 0 16px;
-box-sizing: border-box;
-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-position: relative;
-z-index: 9999;
+  width: 100%;
+  max-width: 900px;
+  margin: 10px auto 25px;
+  padding: 0 16px;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  position: relative;
+  z-index: 9999;
 }
 
 .oopy-search-wrapper {
-position: relative;
-display: flex;
-align-items: center;
-background: #ffffff;
-border: 2px solid #e5e7eb;
-border-radius: 12px;
-padding: 10px 16px;
-box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-transition: all 0.2s ease;
-pointer-events: auto;
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 10px 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+  pointer-events: auto;
 }
 
 .oopy-search-wrapper:focus-within {
-border-color: #3b82f6;
-box-shadow: 0 4px 16px rgba(59, 130, 246, 0.15);
+  border-color: #3b82f6;
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.15);
 }
 
 .oopy-search-icon {
-width: 20px;
-height: 20px;
-color: #9ca3af;
-margin-right: 12px;
-flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  color: #9ca3af;
+  margin-right: 12px;
+  flex-shrink: 0;
 }
 
 .oopy-search-input {
-width: 100%;
-border: none;
-outline: none;
-font-size: 16px;
-color: #1f2937;
-background: transparent;
-pointer-events: auto;
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  color: #1f2937;
+  background: transparent;
+  pointer-events: auto;
 }
 
 .oopy-search-input::placeholder {
-color: #9ca3af;
+  color: #9ca3af;
 }
 
 .oopy-search-clear {
-background: #f3f4f6;
-border: none;
-color: #6b7280;
-width: 24px;
-height: 24px;
-border-radius: 50%;
-cursor: pointer;
-display: none;
-align-items: center;
-justify-content: center;
-font-size: 13px;
-margin-left: 8px;
+  background: #f3f4f6;
+  border: none;
+  color: #6b7280;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  margin-left: 8px;
 }
 
 .oopy-search-clear:hover {
-background: #e5e7eb;
-color: #111827;
+  background: #e5e7eb;
+  color: #111827;
 }
 
 .oopy-search-info {
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-top: 10px;
-padding: 0 4px;
-font-size: 14px;
-color: #6b7280;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  padding: 0 4px;
+  font-size: 14px;
+  color: #6b7280;
 }
 
 .oopy-search-count {
-font-weight: 600;
-color: #3b82f6;
+  font-weight: 600;
+  color: #3b82f6;
 }
 
 .oopy-no-results {
-text-align: center;
-padding: 40px 20px;
-background: #f9fafb;
-border-radius: 12px;
-margin-top: 20px;
-color: #6b7280;
-font-size: 15px;
-display: none;
+  text-align: center;
+  padding: 40px 20px;
+  background: #f9fafb;
+  border-radius: 12px;
+  margin-top: 20px;
+  color: #6b7280;
+  font-size: 15px;
+  display: none;
 }
 
+/* 갤러리 그리드 레이아웃 유지 설정 */
 .notion-gallery-view,
 .notion-collection_view-block,
 [class*="gallery-view"],
 [class*="collection_view"] {
-justify-content: flex-start !important;
-justify-items: start !important;
-align-content: start !important;
-align-items: start !important;
+  justify-content: flex-start !important;
+  justify-items: start !important;
+  align-content: start !important;
+  align-items: start !important;
 }
 
-.notion-collection-card,
-[class*="collection-card"] {
-margin-left: 0 !important;
-}
-
+/* 다크모드 지원 */
 @media (prefers-color-scheme: dark) {
-.oopy-search-wrapper {
-background: #1f2937;
-border-color: #374151;
-}
-.oopy-search-input {
-color: #f9fafb;
-}
-.oopy-search-clear {
-background: #374151;
-color: #9ca3af;
-}
-.oopy-no-results {
-background: #111827;
-color: #9ca3af;
-}
+  .oopy-search-wrapper {
+    background: #1f2937;
+    border-color: #374151;
+  }
+  .oopy-search-input {
+    color: #f9fafb;
+  }
+  .oopy-search-clear {
+    background: #374151;
+    color: #9ca3af;
+  }
+  .oopy-no-results {
+    background: #111827;
+    color: #9ca3af;
+  }
 }
