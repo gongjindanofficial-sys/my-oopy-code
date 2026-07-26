@@ -1,0 +1,184 @@
+/* 공진단 우피 - 기관 리뷰 검색 */
+
+.gj-review-search {
+  width: 100%;
+  max-width: 560px;
+  margin: 18px 2px 28px;
+  box-sizing: border-box;
+}
+
+.gj-review-search__box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.gj-review-search__icon {
+  position: absolute;
+  left: 15px;
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  pointer-events: none;
+  opacity: 0.52;
+}
+
+.gj-review-search__input {
+  width: 100%;
+  height: 48px;
+  padding: 0 48px 0 45px;
+  border: 1px solid rgba(55, 53, 47, 0.18);
+  border-radius: 12px;
+  outline: none;
+  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.96);
+  color: rgb(55, 53, 47);
+  font: inherit;
+  font-size: 15px;
+  line-height: 1;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    background-color 150ms ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.gj-review-search__input::placeholder {
+  color: rgba(55, 53, 47, 0.45);
+}
+
+.gj-review-search__input:focus {
+  border-color: rgba(35, 131, 226, 0.72);
+  box-shadow: 0 0 0 3px rgba(35, 131, 226, 0.12);
+  background: #fff;
+}
+
+.gj-review-search__input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.gj-review-search__clear {
+  position: absolute;
+  right: 10px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(55, 53, 47, 0.08);
+  color: rgba(55, 53, 47, 0.65);
+  font: inherit;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.gj-review-search__clear.is-visible {
+  display: flex;
+}
+
+.gj-review-search__clear:hover {
+  background: rgba(55, 53, 47, 0.14);
+}
+
+.gj-review-search__status {
+  min-height: 20px;
+  margin: 8px 3px 0;
+  color: rgba(55, 53, 47, 0.58);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.gj-review-search__status[data-state="loading"]::before {
+  content: "";
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  margin-right: 7px;
+  border: 2px solid rgba(55, 53, 47, 0.18);
+  border-top-color: rgba(55, 53, 47, 0.62);
+  border-radius: 50%;
+  vertical-align: -1px;
+  animation: gj-review-search-spin 0.75s linear infinite;
+}
+
+.gj-review-search__status[data-state="success"] {
+  color: rgba(35, 131, 226, 0.9);
+}
+
+.gj-review-search__status[data-state="empty"],
+.gj-review-search__status[data-state="error"] {
+  color: rgb(212, 76, 71);
+}
+
+/*
+ * 검색에서 제외된 카드의 '카드 슬롯 전체'를 숨깁니다.
+ * display:none으로 제거하므로 남은 카드는 갤러리 좌측 상단부터 자동 재배치됩니다.
+ */
+.gj-review-card-hidden {
+  display: none !important;
+}
+
+@keyframes gj-review-search-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 우피/노션 다크 모드 */
+.notion-dark-theme .gj-review-search__input {
+  border-color: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.notion-dark-theme .gj-review-search__input::placeholder {
+  color: rgba(255, 255, 255, 0.42);
+}
+
+.notion-dark-theme .gj-review-search__input:focus {
+  border-color: rgba(82, 156, 230, 0.82);
+  box-shadow: 0 0 0 3px rgba(82, 156, 230, 0.16);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.notion-dark-theme .gj-review-search__icon,
+.notion-dark-theme .gj-review-search__status {
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.notion-dark-theme .gj-review-search__clear {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.68);
+}
+
+@media (max-width: 480px) {
+  .gj-review-search {
+    max-width: none;
+    margin-top: 14px;
+    margin-bottom: 22px;
+  }
+
+  .gj-review-search__input {
+    height: 46px;
+    font-size: 16px; /* iOS 자동 확대 방지 */
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gj-review-search__input {
+    transition: none;
+  }
+
+  .gj-review-search__status[data-state="loading"]::before {
+    animation-duration: 1.5s;
+  }
+}
