@@ -1,5 +1,5 @@
 /* STREAMING_CHUNK:Styling main search bar container and components... /
-/ 검색창 전체 메인 컨테이너 */
+/ 우피 노션 검색창 메인 컨테이너 */
 .oopy-search-container {
 width: 100%;
 margin: 16px 0 24px 0;
@@ -100,27 +100,31 @@ font-weight: 600;
 color: #2eaadc;
 }
 
-/* STREAMING_CHUNK:Ensuring left-top grid alignment for Notion gallery cards... /
+/* STREAMING_CHUNK:Configuring grid layout and top-left card alignment... /
 / 노션 갤러리 그리드 레이아웃 강제 좌상단 정렬 /
 .notion-gallery-view,
 div[class="galleryView"],
-.notion-collection-gallery {
+.notion-collection-gallery,
+[class*="collectionGallery"],
+.notion-collection-view-body {
 display: grid !important;
 grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)) !important;
 justify-content: start !important;
 align-content: start !important;
 gap: 16px !important;
+width: 100% !important;
 }
 
-/* 검색 조건 미일치 카드 완전히 숨김 */
+/* 검색 조건 미일치 카드 개별 숨김 */
 .oopy-card-hidden {
 display: none !important;
 }
 
-/* 카드 높이 정렬 및 여백 제어 */
+/* 카드 높이 정렬 및 여백 제어 /
 .notion-collection-card,
-a.notion-collection-card,
-div.notion-collection-card {
+a[class="collectionCard"],
+div[class*="collectionCard"],
+[class*="collection-card"] {
 margin: 0 !important;
 height: 100% !important;
 box-sizing: border-box !important;
