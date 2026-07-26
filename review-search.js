@@ -268,8 +268,18 @@
   }
 
   function initialize() {
+    /*
+     * 메인 페이지와 모든 리뷰 페이지 모두에서 리뷰 갤러리를 감지해
+     * 모바일 2열용 클래스를 적용합니다.
+     * 검색 UI는 아래에서 모든 리뷰 페이지에만 생성됩니다.
+     */
+    const cards = getCards();
+
     if (!isTargetPage()) {
-      clearCardFilter();
+      cards.forEach(({ element }) => {
+        element.classList.remove("gj-review-card-hidden");
+      });
+      document.body.classList.remove("gj-review-search-active");
       document.getElementById(UI_ID)?.remove();
       initialized = false;
       allCardsLoaded = false;
@@ -279,7 +289,6 @@
     if (initialized && document.getElementById(UI_ID)) return;
 
     const pageTitle = document.querySelector("h1.page-title");
-    const cards = getCards();
 
     // 비밀번호 입력 전에는 카드가 없으므로 로그인 후 다시 시도합니다.
     if (!pageTitle || cards.length === 0) return;
@@ -369,5 +378,7 @@
   }
 
   // 우피 내부 페이지 이동에 대응
-  window.addEventListener("popstate", initialize);
+  window.addEventListener("popstate", () => {
+    window.setTimeout(initialize, 50);
+  });
 })();
