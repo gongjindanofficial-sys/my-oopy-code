@@ -95,10 +95,9 @@ font-size: 15px;
 display: none;
 }
 
-/* 갤러리 검색 결과 좌측 상단 밀착 정렬 강제 /
 .notion-gallery-view,
 .notion-collection_view-block,
-[class="gallery-view"],
+[class*="gallery-view"],
 [class*="collection_view"] {
 justify-content: flex-start !important;
 justify-items: start !important;
