@@ -1,4 +1,4 @@
-/* STREAMING_CHUNK:Styling main search bar container and components... /
+/* STREAMING_CHUNK:Styling main search bar container and input field... /
 / 우피 노션 검색창 메인 컨테이너 */
 .oopy-search-container {
 width: 100%;
@@ -41,7 +41,8 @@ stroke-linejoin: round;
 flex-shrink: 0;
 }
 
-/* Input 텍스트 필드 */
+/* STREAMING_CHUNK:Styling input elements and action buttons... /
+/ Input 텍스트 필드 */
 .oopy-search-input {
 width: 100%;
 border: none;
@@ -80,7 +81,8 @@ background: #d3d2ce;
 color: #111;
 }
 
-/* 하단 검색 카운트 뱃지 */
+/* STREAMING_CHUNK:Styling count badges and hidden card states... /
+/ 하단 검색 카운트 뱃지 */
 .oopy-search-info {
 display: flex;
 align-items: center;
@@ -100,34 +102,9 @@ font-weight: 600;
 color: #2eaadc;
 }
 
-/* STREAMING_CHUNK:Configuring grid layout and top-left card alignment... /
-/ 노션 갤러리 그리드 레이아웃 강제 좌상단 정렬 /
-.notion-gallery-view,
-div[class="galleryView"],
-.notion-collection-gallery,
-[class*="collectionGallery"],
-.notion-collection-view-body {
-display: grid !important;
-grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)) !important;
-justify-content: start !important;
-align-content: start !important;
-gap: 16px !important;
-width: 100% !important;
-}
-
-/* 검색 조건 미일치 카드 개별 숨김 */
+/* 검색 조건 미일치 카드 개별 숨김 (레이아웃 틀 강제 변경 제거) */
 .oopy-card-hidden {
 display: none !important;
-}
-
-/* 카드 높이 정렬 및 여백 제어 /
-.notion-collection-card,
-a[class="collectionCard"],
-div[class*="collectionCard"],
-[class*="collection-card"] {
-margin: 0 !important;
-height: 100% !important;
-box-sizing: border-box !important;
 }
 
 /* 다크 모드 대응 */
